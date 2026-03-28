@@ -101,13 +101,14 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
 });
 
 const signUpSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
   email: z.string().email(),
   password: z.string().min(8),
   inviteId: z.string().optional()
 });
 
 export const signUp = validatedAction(signUpSchema, async (data, formData) => {
-  const { email, password, inviteId } = data;
+  const { name, email, password, inviteId } = data;
 
   const existingUser = await db
     .select()
@@ -126,6 +127,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   const passwordHash = await hashPassword(password);
 
   const newUser: NewUser = {
+    name,
     email,
     passwordHash,
     role: 'owner' // Default role, will be overridden if there's an invitation

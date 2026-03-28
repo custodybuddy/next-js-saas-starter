@@ -3,7 +3,15 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { NewUser } from '@/lib/db/schema';
 
-const key = new TextEncoder().encode(process.env.AUTH_SECRET);
+const authSecret = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET;
+
+if (!authSecret) {
+  throw new Error(
+    'NEXTAUTH_SECRET (or AUTH_SECRET) environment variable is not set'
+  );
+}
+
+const key = new TextEncoder().encode(authSecret);
 const SALT_ROUNDS = 10;
 
 export async function hashPassword(password: string) {
