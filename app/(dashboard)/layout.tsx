@@ -34,7 +34,7 @@ function UserMenu() {
       <>
         <Link
           href="/pricing"
-          className="text-sm font-medium text-gray-700 hover:text-gray-900"
+          className="text-sm font-medium text-gray-900 hover:text-gray-950 hover:underline"
         >
           Pricing
         </Link>
@@ -47,10 +47,10 @@ function UserMenu() {
 
   return (
     <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-      <DropdownMenuTrigger>
-        <Avatar className="cursor-pointer size-9">
+      <DropdownMenuTrigger aria-label="Open user menu">
+        <Avatar className="cursor-pointer size-11">
           <AvatarImage alt={user.name || ''} />
-          <AvatarFallback>
+          <AvatarFallback className="text-sm font-semibold">
             {user.email
               .split(' ')
               .map((n) => n[0])
@@ -80,14 +80,14 @@ function UserMenu() {
 
 function Header() {
   return (
-    <header className="border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center">
-          <CircleIcon className="h-6 w-6 text-orange-500" />
-          <span className="ml-2 text-xl font-semibold text-gray-900">ACME</span>
+    <header className="border-b border-gray-300 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center min-h-[64px]">
+        <Link href="/" className="flex items-center gap-2" aria-label="ACME home">
+          <CircleIcon className="h-7 w-7 text-orange-500" />
+          <span className="text-xl font-bold text-gray-950">ACME</span>
         </Link>
         <div className="flex items-center space-x-4">
-          <Suspense fallback={<div className="h-9" />}>
+          <Suspense fallback={<div className="h-11" />}>
             <UserMenu />
           </Suspense>
         </div>
@@ -100,7 +100,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <section className="flex flex-col min-h-screen">
       <Header />
-      {children}
+      <main id="main-content">{children}</main>
     </section>
   );
 }

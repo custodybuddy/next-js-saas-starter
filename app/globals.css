@@ -79,6 +79,33 @@
   body {
     font-family: "Manrope", Arial, Helvetica, sans-serif;
   }
+
+  /* Ensure all interactive elements meet 44px minimum touch target */
+  a,
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
+
+  /* Skip-to-content link for keyboard/switch users */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    z-index: 9999;
+    padding: 0.75rem 1.5rem;
+    background: hsl(25 95% 40%);
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 0 0 0.5rem 0;
+  }
+  .skip-link:focus {
+    top: 0;
+  }
 }
 
 @layer base {
@@ -94,7 +121,7 @@
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted-foreground: 215.4 16.3% 35%;
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
@@ -179,7 +206,7 @@
   --secondary: hsl(240 4.8% 95.9%);
   --secondary-foreground: hsl(240 5.9% 10%);
   --muted: hsl(240 4.8% 95.9%);
-  --muted-foreground: hsl(240 3.8% 46.1%);
+  --muted-foreground: hsl(240 3.8% 35%);
   --accent: hsl(240 4.8% 95.9%);
   --accent-foreground: hsl(240 5.9% 10%);
   --destructive: hsl(0 84.2% 60.2%);

@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, ne, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/drizzle';
 import {
   User,
@@ -149,12 +149,17 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 
   if (inviteId) {
     // Check if there's a valid invitation
+    const parsedInviteId = parseInt(inviteId, 10);
+    if (isNaN(parsedInviteId)) {
+      return { error: 'Invalid or expired invitation.', email, password };
+    }
+
     const [invitation] = await db
       .select()
       .from(invitations)
       .where(
         and(
-          eq(invitations.id, parseInt(inviteId)),
+          eq(invitations.id, parsedInviteId),
           eq(invitations.email, email),
           eq(invitations.status, 'pending')
         )
@@ -226,8 +231,11 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 export async function signOut() {
   const user = (await getUser()) as User;
   const userWithTeam = await getUserWithTeam(user.id);
-  await logActivity(userWithTeam?.teamId, user.id, ActivityType.SIGN_OUT);
-  (await cookies()).delete('session');
+  try {
+    await logActivity(userWithTeam?.teamId, user.id, ActivityType.SIGN_OUT);
+  } finally {
+    (await cookies()).delete('session');
+  }
 }
 
 const updatePasswordSchema = z.object({
@@ -351,6 +359,18 @@ export const updateAccount = validatedActionWithUser(
     const { name, email } = data;
     const userWithTeam = await getUserWithTeam(user.id);
 
+    if (email !== user.email) {
+      const existingUser = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(and(eq(users.email, email), ne(users.id, user.id)))
+        .limit(1);
+
+      if (existingUser.length > 0) {
+        return { error: 'Email address is already in use.' };
+      }
+    }
+
     await Promise.all([
       db.update(users).set({ name, email }).where(eq(users.id, user.id)),
       logActivity(userWithTeam?.teamId, user.id, ActivityType.UPDATE_ACCOUNT)
@@ -368,6 +388,11 @@ export const removeTeamMember = validatedActionWithUser(
   removeTeamMemberSchema,
   async (data, _, user) => {
     const { memberId } = data;
+
+    if (user.role !== 'owner') {
+      return { error: 'Only team owners can remove members' };
+    }
+
     const userWithTeam = await getUserWithTeam(user.id);
 
     if (!userWithTeam?.teamId) {
@@ -402,6 +427,11 @@ export const inviteTeamMember = validatedActionWithUser(
   inviteTeamMemberSchema,
   async (data, _, user) => {
     const { email, role } = data;
+
+    if (user.role !== 'owner') {
+      return { error: 'Only team owners can invite members' };
+    }
+
     const userWithTeam = await getUserWithTeam(user.id);
 
     if (!userWithTeam?.teamId) {

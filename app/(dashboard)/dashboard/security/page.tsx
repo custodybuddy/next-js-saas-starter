@@ -89,10 +89,10 @@ export default function SecurityPage() {
               />
             </div>
             {passwordState.error && (
-              <p className="text-red-500 text-sm">{passwordState.error}</p>
+              <p className="text-red-700 text-sm font-medium" role="alert">{passwordState.error}</p>
             )}
             {passwordState.success && (
-              <p className="text-green-500 text-sm">{passwordState.success}</p>
+              <p className="text-green-800 text-sm font-medium" role="status">{passwordState.success}</p>
             )}
             <Button
               type="submit"
@@ -120,7 +120,7 @@ export default function SecurityPage() {
           <CardTitle>Delete Account</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-700 font-medium mb-4">
             Account deletion is non-reversable. Please proceed with caution.
           </p>
           <form action={deleteAction} className="space-y-4">
@@ -139,7 +139,7 @@ export default function SecurityPage() {
               />
             </div>
             {deleteState.error && (
-              <p className="text-red-500 text-sm">{deleteState.error}</p>
+              <p className="text-red-700 text-sm font-medium" role="alert">{deleteState.error}</p>
             )}
             <Button
               type="submit"

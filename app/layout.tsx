@@ -26,6 +26,9 @@ export default function RootLayout({
       className={`bg-white dark:bg-gray-950 text-black dark:text-white ${manrope.className}`}
     >
       <body className="min-h-[100dvh] bg-gray-50">
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <SWRConfig
           value={{
             fallback: {

@@ -95,10 +95,13 @@ function TeamMembersSkeleton() {
 
 function TeamMembers() {
   const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
+  const { data: currentUser } = useSWR<User>('/api/user', fetcher);
   const [removeState, removeAction, isRemovePending] = useActionState<
     ActionState,
     FormData
   >(removeTeamMember, {});
+
+  const isOwner = currentUser?.role === 'owner';
 
   const getUserDisplayName = (user: Pick<User, 'id' | 'name' | 'email'>) => {
     return user.name || user.email || 'Unknown User';
@@ -123,9 +126,9 @@ function TeamMembers() {
         <CardTitle>Team Members</CardTitle>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-4">
-          {teamData.teamMembers.map((member, index) => (
-            <li key={member.id} className="flex items-center justify-between">
+        <ul className="space-y-2">
+          {teamData.teamMembers.map((member) => (
+            <li key={member.id} className="flex items-center justify-between py-2 min-h-[56px]">
               <div className="flex items-center space-x-4">
                 <Avatar>
                   {/* 
@@ -153,14 +156,15 @@ function TeamMembers() {
                   </p>
                 </div>
               </div>
-              {index > 1 ? (
+              {isOwner && member.user.id !== currentUser?.id ? (
                 <form action={removeAction}>
                   <input type="hidden" name="memberId" value={member.id} />
                   <Button
                     type="submit"
                     variant="outline"
-                    size="sm"
+                    size="default"
                     disabled={isRemovePending}
+                    className="text-gray-800 border-gray-400 hover:border-red-500 hover:text-red-700"
                   >
                     {isRemovePending ? 'Removing...' : 'Remove'}
                   </Button>
@@ -170,7 +174,7 @@ function TeamMembers() {
           ))}
         </ul>
         {removeState?.error && (
-          <p className="text-red-500 mt-4">{removeState.error}</p>
+          <p className="text-red-700 font-medium mt-4" role="alert">{removeState.error}</p>
         )}
       </CardContent>
     </Card>
@@ -234,10 +238,10 @@ function InviteTeamMember() {
             </RadioGroup>
           </div>
           {inviteState?.error && (
-            <p className="text-red-500">{inviteState.error}</p>
+            <p className="text-red-700 font-medium" role="alert">{inviteState.error}</p>
           )}
           {inviteState?.success && (
-            <p className="text-green-500">{inviteState.success}</p>
+            <p className="text-green-800 font-medium" role="status">{inviteState.success}</p>
           )}
           <Button
             type="submit"

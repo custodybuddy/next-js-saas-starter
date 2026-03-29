@@ -94,10 +94,10 @@ export default function GeneralPage() {
               <AccountFormWithData state={state} />
             </Suspense>
             {state.error && (
-              <p className="text-red-500 text-sm">{state.error}</p>
+              <p className="text-red-700 text-sm font-medium" role="alert">{state.error}</p>
             )}
             {state.success && (
-              <p className="text-green-500 text-sm">{state.success}</p>
+              <p className="text-green-800 text-sm font-medium" role="status">{state.success}</p>
             )}
             <Button
               type="submit"

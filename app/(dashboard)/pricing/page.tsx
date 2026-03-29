@@ -19,8 +19,9 @@ export default async function PricingPage() {
   const plusPrice = prices.find((price) => price.productId === plusPlan?.id);
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="grid md:grid-cols-2 gap-8 max-w-xl mx-auto">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="main-content">
+      <h1 className="text-3xl font-bold text-gray-950 mb-8 text-center">Pricing</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
         <PricingCard
           name={basePlan?.name || 'Base'}
           price={basePrice?.unitAmount || 800}
@@ -66,22 +67,22 @@ function PricingCard({
   priceId?: string;
 }) {
   return (
-    <div className="pt-6">
-      <h2 className="text-2xl font-medium text-gray-900 mb-2">{name}</h2>
-      <p className="text-sm text-gray-600 mb-4">
-        with {trialDays} day free trial
+    <div className="pt-6 border border-gray-200 rounded-xl p-6 bg-white shadow-sm">
+      <h2 className="text-2xl font-bold text-gray-950 mb-2">{name}</h2>
+      <p className="text-sm text-gray-700 font-medium mb-4">
+        with {trialDays}-day free trial
       </p>
-      <p className="text-4xl font-medium text-gray-900 mb-6">
+      <p className="text-4xl font-bold text-gray-950 mb-6">
         ${price / 100}{' '}
-        <span className="text-xl font-normal text-gray-600">
+        <span className="text-xl font-normal text-gray-700">
           per user / {interval}
         </span>
       </p>
       <ul className="space-y-4 mb-8">
         {features.map((feature, index) => (
           <li key={index} className="flex items-start">
-            <Check className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">{feature}</span>
+            <Check className="h-5 w-5 text-orange-600 mr-2 mt-0.5 flex-shrink-0" aria-hidden="true" />
+            <span className="text-gray-800">{feature}</span>
           </li>
         ))}
       </ul>
