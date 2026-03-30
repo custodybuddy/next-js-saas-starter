@@ -1,7 +1,5 @@
-import { checkoutAction } from '@/lib/payments/actions';
 import { Check } from 'lucide-react';
 import { getStripePrices, getStripeProducts } from '@/lib/payments/stripe';
-import { SubmitButton } from './submit-button';
 
 // Prices are fresh for one hour max
 export const revalidate = 3600;
@@ -21,6 +19,9 @@ export default async function PricingPage() {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="main-content">
       <h1 className="text-3xl font-bold text-gray-950 mb-8 text-center">Pricing</h1>
+      <p className="mb-8 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-center text-sm font-medium text-amber-800">
+        Billing is temporarily unavailable while we perform maintenance.
+      </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
         <PricingCard
           name={basePlan?.name || 'Base'}
@@ -32,7 +33,6 @@ export default async function PricingPage() {
             'Unlimited Workspace Members',
             'Email Support',
           ]}
-          priceId={basePrice?.id}
         />
         <PricingCard
           name={plusPlan?.name || 'Plus'}
@@ -44,7 +44,6 @@ export default async function PricingPage() {
             'Early Access to New Features',
             '24/7 Support + Slack Access',
           ]}
-          priceId={plusPrice?.id}
         />
       </div>
     </main>
@@ -56,15 +55,13 @@ function PricingCard({
   price,
   interval,
   trialDays,
-  features,
-  priceId,
+  features
 }: {
   name: string;
   price: number;
   interval: string;
   trialDays: number;
   features: string[];
-  priceId?: string;
 }) {
   return (
     <div className="pt-6 border border-gray-200 rounded-xl p-6 bg-white shadow-sm">
@@ -86,10 +83,14 @@ function PricingCard({
           </li>
         ))}
       </ul>
-      <form action={checkoutAction}>
-        <input type="hidden" name="priceId" value={priceId} />
-        <SubmitButton />
-      </form>
+      <button
+        type="button"
+        className="inline-flex h-10 w-full items-center justify-center rounded-md bg-gray-300 px-4 text-sm font-medium text-gray-700"
+        disabled
+        aria-disabled="true"
+      >
+        Temporarily Unavailable
+      </button>
     </div>
   );
 }

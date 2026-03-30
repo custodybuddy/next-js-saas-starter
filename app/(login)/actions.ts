@@ -19,7 +19,6 @@ import {
 import { comparePasswords, hashPassword, setSession } from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { createCheckoutSession } from '@/lib/payments/stripe';
 import { getUser, getUserWithTeam } from '@/lib/db/queries';
 import {
   validatedAction,
@@ -93,8 +92,7 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
 
   const redirectTo = formData.get('redirect') as string | null;
   if (redirectTo === 'checkout') {
-    const priceId = formData.get('priceId') as string;
-    return createCheckoutSession({ team: foundTeam, priceId });
+    redirect('/pricing?billing=disabled');
   }
 
   redirect('/dashboard');
@@ -221,8 +219,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 
   const redirectTo = formData.get('redirect') as string | null;
   if (redirectTo === 'checkout') {
-    const priceId = formData.get('priceId') as string;
-    return createCheckoutSession({ team: createdTeam, priceId });
+    redirect('/pricing?billing=disabled');
   }
 
   redirect('/dashboard');
@@ -345,6 +342,45 @@ export const deleteAccount = validatedActionWithUser(
 
     (await cookies()).delete('session');
     redirect('/sign-in');
+  }
+);
+
+const updateProfileSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  bio: z.string().max(500, 'Bio must be 500 characters or less').optional(),
+  preferredBibleTranslation: z
+    .enum(['NIV', 'KJV', 'ESV', 'NLT', 'NASB', 'CSB', 'NKJV', 'MSG'])
+    .or(z.literal(''))
+    .optional()
+});
+
+export const updateProfile = validatedActionWithUser(
+  updateProfileSchema,
+  async (data, _, user) => {
+    const name = data.name.trim();
+    const bio = data.bio?.trim() || '';
+    const preferredBibleTranslation = data.preferredBibleTranslation || '';
+    const userWithTeam = await getUserWithTeam(user.id);
+
+    await Promise.all([
+      db
+        .update(users)
+        .set({
+          name,
+          bio: bio || null,
+          preferredBibleTranslation: preferredBibleTranslation || null,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, user.id)),
+      logActivity(userWithTeam?.teamId, user.id, ActivityType.UPDATE_ACCOUNT)
+    ]);
+
+    return {
+      name,
+      bio,
+      preferredBibleTranslation,
+      success: 'Profile updated successfully.'
+    };
   }
 );
 

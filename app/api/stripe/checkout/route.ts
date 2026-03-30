@@ -3,10 +3,17 @@ import { db } from '@/lib/db/drizzle';
 import { users, teams, teamMembers } from '@/lib/db/schema';
 import { setSession } from '@/lib/auth/session';
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/payments/stripe';
+import { STRIPE_ENABLED } from '@/lib/payments/stripe';
 import Stripe from 'stripe';
 
 export async function GET(request: NextRequest) {
+  if (!STRIPE_ENABLED) {
+    return NextResponse.redirect(new URL('/pricing?billing=disabled', request.url));
+  }
+
+  const { getStripeClient } = await import('@/lib/payments/stripe');
+  const stripe = getStripeClient();
+
   const searchParams = request.nextUrl.searchParams;
   const sessionId = searchParams.get('session_id');
 

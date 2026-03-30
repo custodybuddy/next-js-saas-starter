@@ -4,7 +4,17 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Users, Settings, Shield, Activity, Menu } from 'lucide-react';
+import {
+  Users,
+  Settings,
+  Shield,
+  Activity,
+  Menu,
+  UserCircle,
+  Home,
+  Sparkles,
+  BookOpen
+} from 'lucide-react';
 
 export default function DashboardLayout({
   children
@@ -16,9 +26,17 @@ export default function DashboardLayout({
 
   const navItems = [
     { href: '/dashboard', icon: Users, label: 'Team' },
+    { href: '/dashboard/profile', icon: UserCircle, label: 'Profile' },
     { href: '/dashboard/general', icon: Settings, label: 'General' },
     { href: '/dashboard/activity', icon: Activity, label: 'Activity' },
     { href: '/dashboard/security', icon: Shield, label: 'Security' }
+  ];
+  const mobileBottomNavItems = [
+    { href: '/dashboard', icon: Home, label: 'home' },
+    { href: '/dashboard', icon: Sparkles, label: 'Rae' },
+    { href: '/dashboard/profile', icon: UserCircle, label: 'profilehome' },
+    { href: '/dashboard/activity', icon: BookOpen, label: 'My Prayers' },
+    { href: '/dashboard/general', icon: Settings, label: 'Settings' }
   ];
 
   return (
@@ -78,8 +96,33 @@ export default function DashboardLayout({
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto p-4">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 pb-24">{children}</main>
       </div>
+
+      <nav
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white/95 backdrop-blur"
+        aria-label="Mobile bottom navigation"
+      >
+        <div className="grid grid-cols-5 gap-1 px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          {mobileBottomNavItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={`${item.href}-${item.label}`}
+                href={item.href}
+                className={`flex min-h-[56px] flex-col items-center justify-center rounded-md text-[11px] font-medium leading-tight ${
+                  isActive
+                    ? 'bg-orange-50 text-orange-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <item.icon className="mb-1 h-4 w-4" />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }

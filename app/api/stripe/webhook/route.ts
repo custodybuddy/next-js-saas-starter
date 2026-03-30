@@ -1,10 +1,22 @@
 import Stripe from 'stripe';
-import { handleSubscriptionChange, stripe } from '@/lib/payments/stripe';
+import {
+  STRIPE_ENABLED,
+  getStripeClient,
+  handleSubscriptionChange
+} from '@/lib/payments/stripe';
 import { NextRequest, NextResponse } from 'next/server';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: NextRequest) {
+  if (!STRIPE_ENABLED) {
+    return NextResponse.json(
+      { error: 'Stripe is temporarily disabled.' },
+      { status: 503 }
+    );
+  }
+
+  const stripe = getStripeClient();
   const payload = await request.text();
   const signature = request.headers.get('stripe-signature') as string;
 
